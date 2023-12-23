@@ -49,7 +49,7 @@ const userSchema = mongoose.Schema({
         type: String,
         minlength: [10, 'Account number must be at least 10 characters long'],
         maxlength: [10, 'Account cannot exceed 10 characters'],
-        default:""
+        
     },
     bank:{
         type: String,
