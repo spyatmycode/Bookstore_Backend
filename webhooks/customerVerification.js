@@ -112,7 +112,11 @@ router.post('/customer-verification', async (req, res) => {
             case "charge.success": {
                 res.sendStatus(200);
 
-                const { data, customer, metadata } = req.body;
+                const { data } = req.body;
+
+                const { customer, metadata, amount} = data
+
+                const {book} = metadata
 
                 const customerToBeUpdated = await User.findOne({ customer_code: customer?.customer_code });
 
@@ -124,7 +128,7 @@ router.post('/customer-verification', async (req, res) => {
 
                 const savedCustomer = await customerToBeUpdated.save()
 
-                const messageContent = { to: '2347051807727', message: `The webhook route was hit`, sender_name: 'Sendchamp', route: 'dnd' }
+                const messageContent = { to: '2347051807727', message: `Customer (${customer?.customer_code}) ${customerToBeUpdated?.first_name} ${customerToBeUpdated?.last_name} just bought a book ${book?.bookName} by ${book.bookAuthor} for NGN${parseFloat(amount/100)}`, sender_name: 'Sendchamp', route: 'dnd' }
 
                 sendVerificationSms(messageContent)
 
