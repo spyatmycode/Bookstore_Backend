@@ -16,7 +16,12 @@ const data = {
     metadata: {
       name: 'Adeola',
       phone: '7051807727',
-      referrer: 'http://localhost:5173/'
+      referrer: 'http://localhost:5173/',
+      book: {
+        bookName:  "Non paystack title",
+        bookAuthor: "Non paystack author",
+        bookYear: 2004,
+      }
     },
     fees_breakdown: { amount: '150', formula: null, type: 'paystack' },
     log: null,
@@ -49,7 +54,7 @@ const data = {
       first_name: 'Adeola',
       last_name: 'Akeju',
       email: 'akejunifemi11@gmail.com',
-      customer_code: 'CUS_4ohragj1p4c4fay',
+      customer_code: 'CUS_1ouhtbfxcs26sgo',
       phone: '7051807727',
       metadata: [Object],
       risk_action: 'default',

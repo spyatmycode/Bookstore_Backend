@@ -116,9 +116,13 @@ router.post('/customer-verification', async (req, res) => {
 
                 const { customer, metadata, amount} = data
 
+                console.log(customer);
+
                 const {book} = metadata
 
-                const customerToBeUpdated = await User.findOne({ customer_code: customer?.customer_code });
+                const customerToBeUpdated = await User.findOne({ payStackCustomerID: customer?.customer_code });
+
+                console.log(customerToBeUpdated);
 
                 if (!customerToBeUpdated) throw Error("Customer not found!")
 
@@ -145,10 +149,7 @@ router.post('/customer-verification', async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        if(error.code === 404){
-            console.log("haha 404");
-            return
-        }
+
         res.status(500).json({ message: 'Internal Server Error' });
     }
 
