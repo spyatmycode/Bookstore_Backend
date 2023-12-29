@@ -32,7 +32,8 @@ router.post('/customer-verification', async (req, res) => {
 
         const messageContent = [
             { to: '2347051807727', message: `Customer (${customer?.first_name} ${customer?.last_name}) with code ${data?.customer_code} has been verified`, sender_name: 'Sendchamp', route: 'dnd' },
-            { to: '2347051807727', message: `Customer(${customer?.first_name} ${customer?.last_name}) with code ${data?.customer_code} has failed verification because ${data?.reason}`, sender_name: 'Sendchamp', route: 'dnd' }
+            { to: '2347051807727', message: `Customer(${customer?.first_name} ${customer?.last_name}) with code ${data?.customer_code} has failed verification because ${data?.reason}`, sender_name: 'Sendchamp', route: 'dnd' },
+            
         ]
 
         const { customer_code } = data
@@ -60,7 +61,20 @@ router.post('/customer-verification', async (req, res) => {
 
             await sendVerificationSms(messageContent[0])
 
-        } else {
+        }
+
+        else if(event === "paymentrequest.success"){
+            res.sendStatus(200);
+
+            const messageContent = { to: '2347051807727', message: `Customer(${customer?.first_name} ${customer?.last_name}) with code ${data?.customer_code} has paid for ${data?.description} for #${(data?.amount)/100}`, sender_name: 'Sendchamp', route: 'dnd' }
+
+            sendVerificationSms(messageContent)
+
+
+        }
+        
+        
+        else {
             res.sendStatus(200)
 
             const  customerToBeUpdated = await User.findOne({ payStackCustomerID: customer_code});
