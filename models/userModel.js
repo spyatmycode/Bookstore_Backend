@@ -54,6 +54,10 @@ const userSchema = mongoose.Schema({
     bank:{
         type: String,
         default:""
+    },
+    transactions:{
+        type: [mongoose.Schema.Types.Mixed],
+        default:[]
     }
 
 

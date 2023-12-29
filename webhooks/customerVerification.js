@@ -9,100 +9,142 @@ import { sendVerificationSms } from '../utils/sendVerificationMessage.js';
 import { User } from '../models/userModel.js';
 import { PAYSTACK_SECRET_LIVE } from '../config.js';
 
-
-
-router.post('/customer-verification', async (req, res) => {
-
-
-
+const allowContinuation = (req) => {
     const hash = crypto.createHmac('sha512', PAYSTACK_SECRET_LIVE).update(JSON.stringify(req.body)).digest('hex');
 
+    //TODO: remove the comment below
     if (hash !== req.headers['x-paystack-signature']) {
         throw new Error("Invalid signature! Request is unauthorized")
     }
 
+}
+
+
+
+router.post('/customer-verification', async (req, res) => {
+
+    allowContinuation(req)
+
+
     try {
-        const { event, data} = req.body;
+        const { event, data } = req.body;
 
 
-        const customer = await User.findOne({payStackCustomerID: data?.customer_code}).select('first_name last_name')
+        console.log();
 
-        if(!customer) throw Error("customer not found")
+        switch (event) {
+            case "customeridentification.success":
+                {
+                    
+
+                    res.sendStatus(200)
+
+                    
+
+                    const customer = await User.findOne({ payStackCustomerID: data?.customer_code }).select('first_name last_name')
+
+                    if (!customer) throw Error("customer not found")
 
 
-        const messageContent = [
-            { to: '2347051807727', message: `Customer (${customer?.first_name} ${customer?.last_name}) with code ${data?.customer_code} has been verified`, sender_name: 'Sendchamp', route: 'dnd' },
-            { to: '2347051807727', message: `Customer(${customer?.first_name} ${customer?.last_name}) with code ${data?.customer_code} has failed verification because ${data?.reason}`, sender_name: 'Sendchamp', route: 'dnd' },
-            
-        ]
+                    const messageContent = [
+                        { to: '2347051807727', message: `Customer (${customer?.first_name} ${customer?.last_name}) with code ${data?.customer_code} has been verified`, sender_name: 'Sendchamp', route: 'dnd' },
+                        { to: '2347051807727', message: `Customer(${customer?.first_name} ${customer?.last_name}) with code ${data?.customer_code} has failed verification because ${data?.reason}`, sender_name: 'Sendchamp', route: 'dnd' },
 
-        const { customer_code } = data
+                    ]
 
 
-        if (event === "customeridentification.success") {
+                    const customerToBeUpdated = await User.findOne({ payStackCustomerID: customer_code });
 
-            res.sendStatus(200)
+                    if (customerToBeUpdated) {
 
-            const customerToBeUpdated = await User.findOne({ payStackCustomerID: customer_code});
+                        customerToBeUpdated.isVerified = "true";
 
-            if(customerToBeUpdated){
+                        const saveCustomerStatus = await customerToBeUpdated.save()
 
-                customerToBeUpdated.isVerified = "true";
+                        io.emit("customer-verification", { message: messageContent[0] })
 
-                const saveCustomerStatus = await customerToBeUpdated.save()
+                    }
+                    else {
+                        throw Error("Customer does not exist")
 
-                io.emit("customer-verification", {message: messageContent[0]})
+                    }
+
+                    await sendVerificationSms(messageContent[0])
+
+                    break;
+                }
+
+            case "customeridentification.failed":
+                {
+                   
+                    res.sendStatus(200)
+
+                    const { customer_code } = data
+
+                    
+
+                    if (!customer) throw Error("customer not found")
+
+                    const customerToBeUpdated = await User.findOne({ payStackCustomerID: customer_code });
+
+                    console.log(customerToBeUpdated);
+
+                    if (customerToBeUpdated) {
+
+                        customerToBeUpdated.isVerified = "false";
+
+                        const saveCustomerStatus = await customerToBeUpdated.save()
+
+                        io.emit("customer-verification", { message: messageContent[1] })
+
+
+
+                    } else {
+                        throw Error("Customer does not exist")
+                    }
+
+
+                    await sendVerificationSms(messageContent[1])
+
+                    break;
+                }
+
+            case "charge.success": {
+                res.sendStatus(200);
+
+                const { data, customer, metadata } = req.body;
+
+                const customerToBeUpdated = await User.findOne({ customer_code: customer?.customer_code });
+
+                if (!customerToBeUpdated) throw Error("Customer not found!")
+
+
+
+                await customerToBeUpdated.transactions.push({ ...data, item: { ...metadata } });
+
+                const savedCustomer = await customerToBeUpdated.save()
+
+                const messageContent = { to: '2347051807727', message: `The webhook route was hit`, sender_name: 'Sendchamp', route: 'dnd' }
+
+                sendVerificationSms(messageContent)
+
+                break
 
             }
-            else{
-                throw Error("Customer does not exist")
-                
-            }
 
-            await sendVerificationSms(messageContent[0])
-
+            default:
+                res.sendStatus(404)
+                break;
         }
 
-        else if(event === "paymentrequest.success"){
-            res.sendStatus(200);
-
-            const messageContent = { to: '2347051807727', message: `Customer(${customer?.first_name} ${customer?.last_name}) with code ${data?.customer_code} has paid for ${data?.description} for #${(data?.amount)/100}`, sender_name: 'Sendchamp', route: 'dnd' }
-
-            sendVerificationSms(messageContent)
-
-
-        }
-        
-        
-        else {
-            res.sendStatus(200)
-
-            const  customerToBeUpdated = await User.findOne({ payStackCustomerID: customer_code});
-
-            console.log(customerToBeUpdated);
-
-            if (customerToBeUpdated) {
-
-                customerToBeUpdated.isVerified = "false";
-
-                const saveCustomerStatus = await customerToBeUpdated.save()
-
-                io.emit("customer-verification", {message: messageContent[1]})
-
-
-
-            }else{
-                throw Error("Customer does not exist")
-            }
-
-
-            await sendVerificationSms(messageContent[1])
-
-        }
 
 
     } catch (error) {
         console.error(error);
+        if(error.code === 404){
+            console.log("haha 404");
+            return
+        }
         res.status(500).json({ message: 'Internal Server Error' });
     }
 
