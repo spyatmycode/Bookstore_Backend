@@ -49,7 +49,7 @@ export const getSingleBook =  async (req, res) => {
 export const addBook = async (req, res) => {
     try {
 
-        const { title, author, publishYear } = req.body
+        const { title, author, publishYear, imageUrl } = req.body
 
         const userId =req.userId._id
 
@@ -61,7 +61,8 @@ export const addBook = async (req, res) => {
             title,
             author,
             publishYear,
-            userId
+            userId,
+            imageUrl
         }
 
         const book = await Book.create(newBook);
@@ -86,7 +87,7 @@ export const addBook = async (req, res) => {
 export const updateBook = async (req, res) => {
     try {
 
-        const { title, author, publishYear } = req.body
+        const { title, author, publishYear, imageUrl } = req.body
 
         if (!title || !author || !publishYear) {
             return res.status(400).send({ message: "Please enter all the required fields" })
@@ -94,7 +95,7 @@ export const updateBook = async (req, res) => {
 
         const { id } = req.params
 
-        const result = await Book.findByIdAndUpdate(id, { title: title, author: author, publishYear: publishYear });
+        const result = await Book.findByIdAndUpdate(id, { title: title, author: author, publishYear: publishYear, imageUrl: imageUrl });
 
         if(!result){
             return res.status(400).send({message: "Book not found"})
