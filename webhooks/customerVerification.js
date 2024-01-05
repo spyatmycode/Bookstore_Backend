@@ -7,7 +7,7 @@ const router = express.Router()
 import { io } from '../index.js';
 import { sendVerificationSms } from '../utils/sendVerificationMessage.js';
 import { User } from '../models/userModel.js';
-import { PAYSTACK_SECRET_LIVE } from '../config.js';
+import { PAYSTACK_SECRET_LIVE } from '../config/config.js';
 
 const allowContinuation = (req) => {
     const hash = crypto.createHmac('sha512', PAYSTACK_SECRET_LIVE).update(JSON.stringify(req.body)).digest('hex');

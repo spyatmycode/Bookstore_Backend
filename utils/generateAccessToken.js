@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { SECRET } from '../config.js';
+import { SECRET } from '../config/config.js';
 
 export const generateAccessToken = (_id)=>{
 

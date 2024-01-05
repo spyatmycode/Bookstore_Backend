@@ -19,8 +19,8 @@ const bookSchema = mongoose.Schema({
         type:String,
         required: true
     },
-    imageUrl:{
-        type: String,
+    image:{
+        type: mongoose.Schema.Types.Mixed,
         required: false,
     }
 

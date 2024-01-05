@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { PAYSTACK_SECRET_LIVE, PAYSTACK_SECRET_TEST } from '../config.js';
+import { PAYSTACK_SECRET_LIVE, PAYSTACK_SECRET_TEST } from '../config/config.js';
 import { User } from '../models/userModel.js';
 import bycrpt from 'bcrypt'
 import { hashBVN } from '../utils/hashBVN.js';

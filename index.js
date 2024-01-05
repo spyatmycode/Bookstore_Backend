@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 import {} from 'dotenv/config';
 import express from 'express';
-import { PORT, MONGODBURL } from './config.js'
+import { PORT, MONGODBURL } from './config/config.js'
 import mongoose from 'mongoose'
 import booksRouter from './routes/booksRoutes.js';
 import userRouter from './routes/userRoutes.js';
@@ -18,6 +18,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
+app.use("/images", express.static("images"))
 app
 app.use('/books', booksRouter)
 app.use('/api/users',userRouter)

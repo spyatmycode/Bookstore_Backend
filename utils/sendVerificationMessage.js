@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { SENCHAMP_SECRET_LIVE } from '../config.js';
+import { SENCHAMP_SECRET_LIVE } from '../config/config.js';
 
 
 
