@@ -121,7 +121,7 @@ export const updateBook = async (req, res) => {
 
         const fileName =   `${Date.now()}${path.extname(req.file.originalname)}`
 
-        const imageDownLoadUrl = await addImageToFirebase(file.buffer, fileName)
+        const imageDownLoadUrl =  await addImageToFirebase(file.buffer, fileName)
 
         const { id } = req.params
 

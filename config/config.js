@@ -10,3 +10,4 @@ export const PAYSTACK_SECRET_TEST = process.env.PAYSTACK_SECRET_TEST
 export const PAYSTACK_SECRET_LIVE= process.env.PAYSTACK_SECRET_LIVE
 
 export const SENCHAMP_SECRET_LIVE= process.env.SENDCHAMP_SECRET_LIVE
+
