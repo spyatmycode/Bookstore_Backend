@@ -53,7 +53,7 @@ router.post('/customer-verification', async (req, res) => {
                     ]
 
 
-                    const customerToBeUpdated = await User.findOne({ payStackCustomerID: customer_code });
+                    const customerToBeUpdated = await User.findOne({ payStackCustomerID: data?.customer_code });
 
                     if (customerToBeUpdated) {
 
@@ -79,21 +79,19 @@ router.post('/customer-verification', async (req, res) => {
                    
                     res.sendStatus(200)
 
-                    const { customer_code } = data
-
-                    
+                    const customer = await User.findOne({ payStackCustomerID: data?.customer_code })
 
                     if (!customer) throw Error("customer not found")
 
-                    const customerToBeUpdated = await User.findOne({ payStackCustomerID: customer_code });
+                    
 
-                    console.log(customerToBeUpdated);
+                    console.log(customer);
 
-                    if (customerToBeUpdated) {
+                    if (customer) {
 
-                        customerToBeUpdated.isVerified = "false";
+                        customer.isVerified = "false";
 
-                        const saveCustomerStatus = await customerToBeUpdated.save()
+                        const saveCustomerStatus = await customer.save()
 
                         io.emit("customer-verification", { message: messageContent[1] })
 
@@ -116,6 +114,8 @@ router.post('/customer-verification', async (req, res) => {
 
                 const { customer, metadata, amount} = data
 
+
+
                 console.log(customer);
 
                 const {book} = metadata
@@ -134,6 +134,8 @@ router.post('/customer-verification', async (req, res) => {
 
                 const messageContent = { to: '2347051807727', message: `Customer (${customer?.customer_code}) ${customerToBeUpdated?.first_name} ${customerToBeUpdated?.last_name} just bought a book ${book?.bookName} by ${book.bookAuthor} for NGN${parseFloat(amount/100)}`, sender_name: 'Sendchamp', route: 'dnd' }
 
+                io.emit('charge.success', {message: messageContent.message})
+
                 sendVerificationSms(messageContent)
 
                 break
@@ -148,7 +150,7 @@ router.post('/customer-verification', async (req, res) => {
 
 
     } catch (error) {
-        console.error(error);
+        console.error("WEBHOOK ERROR",error);
 
         res.status(500).json({ message: 'Internal Server Error' });
     }

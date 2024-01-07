@@ -3,6 +3,7 @@ import { PAYSTACK_SECRET_LIVE, PAYSTACK_SECRET_TEST } from '../config/config.js'
 import { User } from '../models/userModel.js';
 import bycrpt from 'bcrypt'
 import { hashBVN } from '../utils/hashBVN.js';
+import { io } from '../index.js';
 
 //This is to create a paystack customer
 
@@ -50,12 +51,21 @@ export const createPayStackCustomer = async (req, res) => {
 
 
 export const validatePayStackCustomer = async (req, res) => {
+
+    const { country, type, account_number, bvn, bank_code, first_name, last_name } = req.body;
+
+    console.log(country);
+
+  
+
+    const customer_code = req.customer_code //This gotten from the requireAuth middleware.
+
+    const userToBeUpdated = await User.findOne({payStackCustomerID:customer_code});
+
+
+
     try {
-        const { country, type, account_number, bvn, bank_code, first_name, last_name } = req.body;
-
-        const customer_code = req.customer_code
-
-
+       
 
         if (!country || !type || !account_number || !bvn || !bank_code || !first_name || !last_name) {
             throw Error("Please enter all fields for customer validation");
@@ -70,7 +80,7 @@ export const validatePayStackCustomer = async (req, res) => {
             }
         })
 
-        const userToBeUpdated = await User.findOne({payStackCustomerID:customer_code});
+        
 
         userToBeUpdated.first_name = first_name;
         userToBeUpdated.last_name = last_name;
@@ -80,6 +90,10 @@ export const validatePayStackCustomer = async (req, res) => {
         userToBeUpdated.country = country;
         userToBeUpdated.account_number = account_number;
 
+        io.emit("customeridentification.success", {
+            message: "Customer verification success"
+        })
+
         const saveUserVerificationStatus = await userToBeUpdated.save()
 
         return res.status(200).send({ message: "Customer verification is being processed" })
@@ -88,9 +102,25 @@ export const validatePayStackCustomer = async (req, res) => {
 
     } catch (error) {
 
-        console.log(error);
+        // console.log("CONTROLLER ERROR",error);
+        if(error?.response?.data?.message === "Customer already validated using the same credentials"){
+            console.log("IN here chief");
 
-        return res.status(400).send({ messagae: "An error occured" })
+
+            userToBeUpdated.isVerified = "true";
+
+            io.emit("customeridentification.success", {
+                message: "Customer verification success"
+            })
+
+            await userToBeUpdated.save()
+
+            return res.status(200).send({ message: "This user has been verified successfully" })
+
+        }
+        console.log(error.response.data.message);
+
+        return res.status(400).send({ message: "An error occured" })
 
     }
 }

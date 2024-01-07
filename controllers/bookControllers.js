@@ -2,6 +2,7 @@ import express from 'express';
 import { Book } from '../models/bookModel.js';
 import path from 'path'
 import { addImageToFirebase, deleteImageFromFirebase } from '../config/firebaseConfig.js';
+import { io } from '../index.js';
 
 
 
@@ -85,10 +86,6 @@ export const addBook = async (req, res) => {
         
 
         const book = await Book.create(newBook);
-
-      
-       
-        
 
         return res.status(201).send(book);
 

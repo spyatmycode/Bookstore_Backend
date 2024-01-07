@@ -11,3 +11,7 @@ export const PAYSTACK_SECRET_LIVE= process.env.PAYSTACK_SECRET_LIVE
 
 export const SENCHAMP_SECRET_LIVE= process.env.SENDCHAMP_SECRET_LIVE
 
+export const API_URL= process.env.API_URL
+
+export const DOMAIN_URL = process.env.DOMAIN_URL
+

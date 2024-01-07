@@ -55,6 +55,11 @@ const userSchema = mongoose.Schema({
         type: String,
         default:""
     },
+    country:{
+        type: String,
+        default:""
+    },
+
     transactions:{
         type: [mongoose.Schema.Types.Mixed],
         default:[]

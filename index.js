@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 import {} from 'dotenv/config';
 import express from 'express';
-import { PORT, MONGODBURL } from './config/config.js'
+import { PORT, MONGODBURL, DOMAIN_URL } from './config/config.js'
 import mongoose from 'mongoose'
 import booksRouter from './routes/booksRoutes.js';
 import userRouter from './routes/userRoutes.js';
@@ -18,8 +18,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
-app.use("/images", express.static("images"))
-app
+// app.use("/images", express.static("images")) this is to be able to access the currently non-existing images folders via localhost:port/images
 app.use('/books', booksRouter)
 app.use('/api/users',userRouter)
 app.use('/api/paystack', payStackUserRouter);
@@ -31,9 +30,10 @@ const server = http.createServer(app)
 
 export const io = new Server(server, {
     cors: {
-        origin: "http://localhost:5173"
+        origin: ["http://localhost:5173", DOMAIN_URL  ]
     }
 });
+
 
 
 app.get('/', function (req, res) {
@@ -52,7 +52,7 @@ io.on("connect_error", (err) => {
   });
 
 
-  io.emit("message")
+  io.emit("message",{message: "Connected"})
 //Connect to the database and then the server starts
 
 
