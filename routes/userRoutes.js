@@ -1,5 +1,5 @@
 import express from 'express';
-import { createUser, getUserData, loginUser } from '../controllers/userController.js';
+import { createUser, getUserData, loginUser, sendEmailVerification, verifyEmail } from '../controllers/userController.js';
 import { createPayStackCustomer, getPayStackCustomer } from '../middlewares/payStack.js';
 import { requireAuth } from '../middlewares/requireAuth.js';
 
@@ -13,6 +13,10 @@ router.post('/signup',createPayStackCustomer ,createUser);
 router.post('/login',loginUser);
 
 router.get('/', requireAuth ,getUserData);
+
+router.post('/send-verification-email', sendEmailVerification);
+
+router.get("/email-verification", verifyEmail);
 
 
 

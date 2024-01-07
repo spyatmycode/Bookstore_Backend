@@ -63,6 +63,14 @@ const userSchema = mongoose.Schema({
     transactions:{
         type: [mongoose.Schema.Types.Mixed],
         default:[]
+    },
+
+    emailConfirmed:{
+
+        type: String,
+        enum: ["true", "false"],
+        default: "false"
+
     }
 
 
@@ -83,9 +91,14 @@ userSchema.statics.signup = async function (email, password, first_name, last_na
 
     const hash = await bcrypt.hash(password, salt);
 
-    const user = await this.create({ email: email, password: hash, first_name, last_name, payStackCustomerID: customer_code, phone });
+    const newuser = await this.create({ email: email, password: hash, first_name, last_name, payStackCustomerID: customer_code, phone });
 
-    return user
+
+    
+
+
+
+    return newuser
 
 
 
@@ -96,7 +109,15 @@ userSchema.statics.login = async function (email, password) {
 
     if (!user) throw Error("Email does not exist");
 
+    if(user.emailConfirmed !== "true"){
+
+        throw Error("Please verify your email address")
+
+    }
+
     const match = await bcrypt.compare(password, user.password);
+
+
 
     if (!match) throw Error("Incorrect login credentials");
 
