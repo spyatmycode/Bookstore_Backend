@@ -34,6 +34,10 @@ export const createUser = async (req, res) => {
 
         const newuser = await User.signup(email, password, first_name, last_name, phone, payStackCustomerCode);
 
+        const sendEmailVerification = await sendVerificationEmail(email)
+
+
+
 
         //they are expecting a link that will send them the link to send the verification mail.
         //then clicking the link from the email will verify their email and then redirect them to the login page
@@ -47,7 +51,7 @@ export const createUser = async (req, res) => {
 
         const token = generateAccessToken(newuser._id)
 
-        return res.status(201).send({ message: "User created successfully", email: newuser.email, token, payStackUserData })
+        return res.status(201).send({ message: "Account created. Please verify your email", email: newuser.email, token })
     } catch (error) {
 
         console.log(error);
@@ -66,6 +70,11 @@ export const loginUser = async (req, res) => {
         if (!validator.isEmail(email)) throw Error("Enter a valid email");
 
         const user = await User.login(email, password);
+
+        if(user.error){
+            console.log("here");
+            return res.status(200).send({message: user.error})
+        }
 
         const token = generateAccessToken(user._id)
 

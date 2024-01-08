@@ -109,17 +109,23 @@ userSchema.statics.login = async function (email, password) {
 
     if (!user) throw Error("Email does not exist");
 
+    const match = await bcrypt.compare(password, user.password);
+
+    if (!match) throw Error("Incorrect login credentials");
+
+
+
     if(user.emailConfirmed !== "true"){
 
-        throw Error("Please verify your email address")
+        return {error: "Please verify your email"}
 
     }
 
-    const match = await bcrypt.compare(password, user.password);
+    
 
 
 
-    if (!match) throw Error("Incorrect login credentials");
+    
 
     return user;
 
