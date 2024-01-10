@@ -166,15 +166,13 @@ export const refundCustomer = async(req, res)=>{
 
     console.log(transactionId);
 
-    return
-
     console.log(transactionId);
 
     const initiateRefund = await axios.post(`https://api.paystack.co/refund`,{
         transaction: transactionId
     },{
         headers:{
-            Authorization:`Bear ${PAYSTACK_SECRET_LIVE}`,
+            Authorization:`Bearer ${PAYSTACK_SECRET_LIVE}`,
             "Content-Type":"application/json"
         }
     })
@@ -182,7 +180,7 @@ export const refundCustomer = async(req, res)=>{
     const response = await initiateRefund?.data?.data
     
 
-    return response.status(201).send({message: initiateRefund?.data?.message})
+    return res.status(201).send({message: initiateRefund?.data?.message})
     
 
     
