@@ -168,7 +168,8 @@ export const refundCustomer = async(req, res)=>{
 
     console.log(transactionId);
 
-    const initiateRefund = await axios.post(`https://api.paystack.co/refund`,{
+    try {
+        const initiateRefund = await axios.post(`https://api.paystack.co/refund`,{
         transaction: transactionId
     },{
         headers:{
@@ -177,10 +178,27 @@ export const refundCustomer = async(req, res)=>{
         }
     })
 
-    const response = await initiateRefund?.data?.data
-    
+    io.emit("refund", {message: initiateRefund?.data?.message})
+
 
     return res.status(201).send({message: initiateRefund?.data?.message})
+
+    } catch (error) {
+
+        if(error.response.data.message ==="Transaction has been fully reversed"){
+            return res.status(200).send({message: error.response.data.message})
+        }
+
+        io.emit("refund", {message: error.response.data.message} )
+
+        console.log(error.response.data.message);
+        
+    }
+
+    
+    
+
+    
     
 
     
