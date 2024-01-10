@@ -60,7 +60,7 @@ export const addBook = async (req, res) => {
         console.log(req.body);  
 
 
-        const { title, author, publishYear } = req.body
+        const { title, author, publishYear, bookId } = req.body
 
         const file = req.file
 
@@ -80,6 +80,7 @@ export const addBook = async (req, res) => {
             author,
             publishYear,
             userId,
+            bookId,
             image: {imageDownLoadUrl, fileName}
         }
 
@@ -104,31 +105,51 @@ export const addBook = async (req, res) => {
 export const updateBook = async (req, res) => {
     try {
 
-        const { title, author, publishYear, previousImageName} = req.body
+        const { title, author, publishYear, previousImageName, previousImageURL} = req.body
 
+        console.log(previousImageURL);
+
+       
         console.log(previousImageName);
 
     
         const file = req.file
+
+        console.log("messup??",file);
+
+        file && console.log("There is file");
+
+        
+
+        
 
 
         if (!title || !author || !publishYear) {
             return res.status(400).send({ message: "Please enter all the required fields" })
         }
 
-        const fileName =   `${Date.now()}${path.extname(req.file.originalname)}`
+        const fileName =  file ? `${Date.now()}${path.extname(req.file.originalname)}`: previousImageName
 
-        const imageDownLoadUrl =  await addImageToFirebase(file.buffer, fileName)
+        const imageDownLoadUrl = file ? await addImageToFirebase(file.buffer, fileName) : previousImageURL
 
+        console.log(imageDownLoadUrl);
+
+    
         const { id } = req.params
 
-        const result = await Book.findByIdAndUpdate(id, { title: title, author: author, publishYear: publishYear, image: {imageDownLoadUrl, fileName} });
+        console.log("Book yi nii",id);
 
-        const deleteImage = await deleteImageFromFirebase(previousImageName)
+        
 
-        if(!result){
-            return res.status(400).send({message: "Book not found"})
-        }
+        const bookToBeUpdated = await Book.findByIdAndUpdate(id,{title, author, publishYear, image:{imageDownLoadUrl, fileName}})
+
+        if(!bookToBeUpdated) throw Error("Book does not exist")
+
+        io.emit('charge.success', {message: "Niggerr"})
+
+
+
+        const deleteImage = file && previousImageURL && previousImageURL !== null && await deleteImageFromFirebase(previousImageName);
 
         return res.status(201).send({ message: "Book updated successfully!" });
 

@@ -8,6 +8,7 @@ import { io } from '../index.js';
 import { sendVerificationSms } from '../utils/sendVerificationMessage.js';
 import { User } from '../models/userModel.js';
 import { PAYSTACK_SECRET_LIVE } from '../config/config.js';
+import { Book } from '../models/bookModel.js';
 
 const allowContinuation = (req) => {
     const hash = crypto.createHmac('sha512', PAYSTACK_SECRET_LIVE).update(JSON.stringify(req.body)).digest('hex');
@@ -129,6 +130,12 @@ router.post('/customer-verification', async (req, res) => {
 
 
                 await customerToBeUpdated.transactions.push({ ...data, item: { ...metadata } });
+
+                const purchasedBook = await Book.findOne({bookId: book?.bookId});
+
+                purchasedBook.transactionId = data.id
+
+                await purchasedBook.save();
 
                 const savedCustomer = await customerToBeUpdated.save()
 

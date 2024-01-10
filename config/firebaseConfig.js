@@ -41,8 +41,20 @@ export const addImageToFirebase = async (file, fileName) => {
 
 export const deleteImageFromFirebase =async(fileName)=>{
 
-    const imageStorageRef = ref(storage, `images/${fileName}`);
-
-    const deleteImage = await deleteObject(imageStorageRef)
+  try {
+  
+    // If no error occurred, the image exists, proceed with deletion
+    await deleteObject(imageStorageRef);
+    console.log('Image deleted successfully');
+  } catch (error) {
+    if (error.code === 'storage/object-not-found') {
+      // Image does not exist, return early
+      console.log('Image does not exist');
+      return;
+    } else {
+      // Handle other errors
+      console.error('Error deleting image:', error);
+    }
+  }
 
 }

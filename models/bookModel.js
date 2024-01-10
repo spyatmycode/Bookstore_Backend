@@ -22,7 +22,17 @@ const bookSchema = mongoose.Schema({
     image:{
         type: mongoose.Schema.Types.Mixed,
         required: false,
+    },
+    bookId: {
+        type: String,
+        required: true,
+
+    },
+
+    transactionId:{
+        type: String,
     }
+
 
 },
     {
