@@ -9,6 +9,8 @@ import { sendVerificationSms } from '../utils/sendVerificationMessage.js';
 import { User } from '../models/userModel.js';
 import { PAYSTACK_SECRET_LIVE } from '../config/config.js';
 import { Book } from '../models/bookModel.js';
+import { transporter } from '../utils/sendMail.js';
+import { mailOptions } from '../utils/sendEmailVerification.js';
 
 const allowContinuation = (req) => {
     const hash = crypto.createHmac('sha512', PAYSTACK_SECRET_LIVE).update(JSON.stringify(req.body)).digest('hex');
@@ -26,6 +28,8 @@ router.post('/customer-verification', async (req, res) => {
 
     allowContinuation(req)
 
+    mailOptions.to = data?.customer?.email
+
 
     try {
         const { event, data } = req.body;
@@ -36,11 +40,11 @@ router.post('/customer-verification', async (req, res) => {
         switch (event) {
             case "customeridentification.success":
                 {
-                    
+
 
                     res.sendStatus(200)
 
-                    
+
 
                     const customer = await User.findOne({ payStackCustomerID: data?.customer_code }).select('first_name last_name')
 
@@ -77,14 +81,14 @@ router.post('/customer-verification', async (req, res) => {
 
             case "customeridentification.failed":
                 {
-                   
+
                     res.sendStatus(200)
 
                     const customer = await User.findOne({ payStackCustomerID: data?.customer_code })
 
                     if (!customer) throw Error("customer not found")
 
-                    
+
 
                     console.log(customer);
 
@@ -113,13 +117,13 @@ router.post('/customer-verification', async (req, res) => {
 
                 const { data } = req.body;
 
-                const { customer, metadata, amount} = data
+                const { customer, metadata, amount } = data
 
 
 
                 console.log(customer);
 
-                const {book} = metadata
+                const { book } = metadata
 
                 const customerToBeUpdated = await User.findOne({ payStackCustomerID: customer?.customer_code });
 
@@ -131,7 +135,7 @@ router.post('/customer-verification', async (req, res) => {
 
                 await customerToBeUpdated.transactions.push({ ...data, item: { ...metadata } });
 
-                const purchasedBook = await Book.findOne({bookId: book?.bookId});
+                const purchasedBook = await Book.findOne({ bookId: book?.bookId });
 
                 purchasedBook.transactionId = data.id
 
@@ -139,14 +143,88 @@ router.post('/customer-verification', async (req, res) => {
 
                 const savedCustomer = await customerToBeUpdated.save()
 
-                const messageContent = { to: '2347051807727', message: `Customer (${customer?.customer_code}) ${customerToBeUpdated?.first_name} ${customerToBeUpdated?.last_name} just bought a book ${book?.bookName} by ${book.bookAuthor} for NGN${parseFloat(amount/100)}`, sender_name: 'Sendchamp', route: 'dnd' }
+                const messageContent = { to: '2347051807727', message: `Customer (${customer?.customer_code}) ${customerToBeUpdated?.first_name} ${customerToBeUpdated?.last_name} just bought a book ${book?.bookName} by ${book.bookAuthor} for NGN${parseFloat(amount / 100)}`, sender_name: 'Sendchamp', route: 'dnd' }
 
-                io.emit('charge.success', {message: messageContent.message})
+                io.emit('charge.success', { message: messageContent.message })
 
-                sendVerificationSms(messageContent)
+                await sendVerificationSms(messageContent)
 
                 break
 
+            }
+
+            case "refund.processing": {
+
+
+                res.sendStatus(200);
+
+                mailOptions.subject = "Refund is processing..."
+                mailOptions.html = `<div style="font-size:20px;">Dear valued customer, your refund is being processed.
+                <br/>
+                The transaction reference is ${data?.transaction_reference}
+                </div>`
+
+
+                transporter.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                        console.error('Error sending email:', error);
+                    } else {
+                        console.log('Email sent:', info.response);
+                    }
+                });
+
+                io.emit("refund", { message: "Refund is being processed" });
+
+                break;
+            }
+
+            case "refund.pending": {
+                res.sendStatus(200);
+
+                mailOptions.subject = "Refund is pending..."
+                mailOptions.html = `<div style="font-size:20px;">Dear valued customer, your refund is being pending.
+                <br/>
+                The transaction reference is ${data?.transaction_reference}
+                </div>`
+
+
+                transporter.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                        console.error('Error sending email:', error);
+                    } else {
+                        console.log('Email sent:', info.response);
+                    }
+                });
+
+                io.emit("refund", { message: "Refund is pending" });
+                break;
+            }
+
+            case "refund.processed": {
+                res.sendStatus(200);
+
+                mailOptions.subject = "Success: Refund has been processed"
+                mailOptions.html = `<div style="font-size:20px;">Dear valued customer, your refund has been processed and you have shall recieved your money within 10 Business days.
+                <br/>
+                The transaction reference is ${data?.transaction_reference}
+                </div>`
+
+
+                transporter.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                        console.error('Error sending email:', error);
+                    } else {
+                        console.log('Email sent:', info.response);
+                    }
+                });
+
+                io.emit("refund", { message: "Success! Your refund has been processed!" });
+
+                const messageContent = { to: '2347051807727', message: `Customer with email ${email.replace('@', '&#64;')} has been refunded. The transaction reference is ${data?.transaction_reference}`, sender_name: 'Sendchamp', route: 'dnd' }
+
+                await sendVerificationSms(messageContent)
+
+                break;
             }
 
             default:
@@ -157,7 +235,7 @@ router.post('/customer-verification', async (req, res) => {
 
 
     } catch (error) {
-        console.error("WEBHOOK ERROR",error);
+        console.error("WEBHOOK ERROR", error);
 
         res.status(500).json({ message: 'Internal Server Error' });
     }

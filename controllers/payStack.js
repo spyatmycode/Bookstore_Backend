@@ -158,3 +158,32 @@ export const getPayStackCustomer = async (req, res) => {
 
     }
 }
+
+
+export const refundCustomer = async(req, res)=>{
+
+    const {transactionId} = req.body;
+
+    console.log(transactionId);
+
+    return
+
+    console.log(transactionId);
+
+    const initiateRefund = await axios.post(`https://api.paystack.co/refund`,{
+        transaction: transactionId
+    },{
+        headers:{
+            Authorization:`Bear ${PAYSTACK_SECRET_LIVE}`,
+            "Content-Type":"application/json"
+        }
+    })
+
+    const response = await initiateRefund?.data?.data
+    
+
+    return response.status(201).send({message: initiateRefund?.data?.message})
+    
+
+    
+}

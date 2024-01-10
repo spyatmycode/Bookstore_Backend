@@ -14,6 +14,14 @@ const transporter = nodemailer.createTransport({
   });
 
 
+  export const mailOptions = {
+    from: 'akejunifemi11@gmail.com', // sender address
+    to: "", // list of receivers
+    cc: '', // Comma separated list or an array
+    subject: '', // Subject line
+    html: "" // html body
+};
+
 
 
 
@@ -22,13 +30,10 @@ export const sendVerificationEmail =async (email)=>{
 
     const link = `${API_URL}/api/users/email-verification?email=${email}&token=${token}`
 
-    const mailOptions = {
-        from: 'akejunifemi11@gmail.com', // sender address
-        to: email, // list of receivers
-        cc: '', // Comma separated list or an array
-        subject: 'AKEJU BOOK STORE: Verify your email address', // Subject line
-        html: `<div style="font-size:20px;">Hi user with email: ${email} <br/> Please verify your email here <a href="${link}">here</a></div>` // html body
-    };
+    mailOptions.to = email;
+    mailOptions.subject = "AKEJU BOOK STORE: Verify your email address";
+    mailOptions.html = `<div style="font-size:20px;">Hi user with email: ${email} <br/> Please verify your email here <a href="${link}">here</a></div>`
+
 
     try {
 

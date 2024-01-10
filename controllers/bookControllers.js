@@ -145,10 +145,6 @@ export const updateBook = async (req, res) => {
 
         if(!bookToBeUpdated) throw Error("Book does not exist")
 
-        io.emit('charge.success', {message: "Niggerr"})
-
-
-
         const deleteImage = file && previousImageURL && previousImageURL !== null && await deleteImageFromFirebase(previousImageName);
 
         return res.status(201).send({ message: "Book updated successfully!" });
