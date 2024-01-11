@@ -31,6 +31,7 @@ const bookSchema = mongoose.Schema({
 
     transactionId:{
         type: String,
+        default: ""
     }
 
 
