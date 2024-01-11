@@ -239,7 +239,7 @@ router.post('/customer-verification', async (req, res) => {
     } catch (error) {
         console.error("WEBHOOK ERROR", error);
 
-        res.status(500).json({ message: 'Internal Server Error' });
+        return res.status(500).json({ message: 'Internal Server Error' });
     }
 
 
