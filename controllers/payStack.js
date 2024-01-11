@@ -132,9 +132,7 @@ export const validatePayStackCustomer = async (req, res) => {
 export const getPayStackCustomer = async (req, res) => {
     try {
 
-        // const email = req.query.email;
-
-        const {email} = req
+        const email = req.query.email;
 
         if (!email) {
             throw new Error("Please enter email address for this user")

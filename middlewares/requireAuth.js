@@ -29,7 +29,6 @@ try {
     req.customer_code = customer_code?.payStackCustomerID
     req.first_name = customer_code.first_name;
     req.last_name = customer_code.last_name;
-    req.email = customer_code.email
 
     
 
