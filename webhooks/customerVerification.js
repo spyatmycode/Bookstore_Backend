@@ -28,11 +28,13 @@ router.post('/customer-verification', async (req, res) => {
 
     allowContinuation(req)
 
-    mailOptions.to = data?.customer?.email
 
 
     try {
         const { event, data } = req.body;
+
+        mailOptions.to = data?.customer?.email
+
 
 
         console.log();
