@@ -142,7 +142,10 @@ router.post('/customer-verification', async (req, res) => {
 
                 const savedCustomer = await customerToBeUpdated.save()
 
+                console.log("the book ID", book?.bookId);
+
                 const purchasedBook = await Book.findOne({ bookId: book?.bookId });  
+
 
                 console.log("The purchased book??",purchasedBook);
 
