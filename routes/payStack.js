@@ -15,7 +15,7 @@ router.post('/validate', requireAuth,validatePayStackCustomer)
 
 //To get a single paystack customer
 
-router.get('/customer', getPayStackCustomer);
+router.get('/customer', requireAuth ,getPayStackCustomer);
 
 router.post('/refund', requireAuth ,refundCustomer);
 

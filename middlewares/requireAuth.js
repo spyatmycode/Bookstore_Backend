@@ -22,13 +22,14 @@ try {
 
     const {_id} =  jwt.verify(token, SECRET);
 
-    const userId = await User.findOne({_id}).select('_id');
+    const userId = await User.findOne({_id}).select('_id email');
     const customer_code = await User.findOne({_id}).select('payStackCustomerID first_name last_name');
     if(!customer_code) throw Error("customer code not found")
     req.userId = userId;
     req.customer_code = customer_code?.payStackCustomerID
     req.first_name = customer_code.first_name;
-    req.last_name = customer_code.first_name;
+    req.last_name = customer_code.last_name;
+    req.email = customer_code.email
 
     
 
