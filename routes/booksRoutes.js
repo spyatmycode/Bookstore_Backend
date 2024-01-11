@@ -1,6 +1,6 @@
 import express from 'express';
 const router = express.Router();
-import { addBook, deleteBook, getAllBooks, getSingleBook,updateBook } from '../controllers/bookControllers.js';
+import { addBook, deleteBook, getAllBooks, getBookByBookId, getSingleBook,updateBook } from '../controllers/bookControllers.js';
 
 import { requireAuth } from '../middlewares/requireAuth.js';
 import { upload } from '../middlewares/multer.js';
@@ -15,6 +15,8 @@ router.get('/', getAllBooks)
 
 //This is to get a particular book by ID
 router.get('/:id', getSingleBook)
+
+router.get('/bookId/:bookId', getBookByBookId)
 
 //This is add a new book to the database
 

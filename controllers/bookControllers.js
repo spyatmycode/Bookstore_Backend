@@ -26,6 +26,14 @@ export const getAllBooks= async (req,res) => {
 
 }
 
+export const getBookByBookId = async(req, res)=>{
+    const {bookId} = req.params;
+
+    const reqBook = await Book.findOne({bookId: bookId});
+
+    return res.status(200).send({message: "Book found", book: reqBook})
+}
+
 //This is to get a particular book by ID
 export const getSingleBook =  async (req, res) => {
 

@@ -130,25 +130,27 @@ router.post('/customer-verification', async (req, res) => {
 
                 const { book } = metadata
 
+                console.log("book from meta data", book);
+
                 const customerToBeUpdated = await User.findOne({ payStackCustomerID: customer?.customer_code });
 
                 console.log(customerToBeUpdated);
 
                 if (!customerToBeUpdated) throw Error("Customer not found!")
 
-
-
                 await customerToBeUpdated.transactions.push({ ...data, item: { ...metadata } });
 
-                const purchasedBook = await Book.findOne({ bookId: book?.bookId });
+                const savedCustomer = await customerToBeUpdated.save()
+
+                const purchasedBook = await Book.findOne({ bookId: book?.bookId });  
 
                 console.log("The purchased book??",purchasedBook);
 
                 purchasedBook.transactionId = data.id
 
-                await purchasedBook.save();
+                const savePurchasedBook  = await purchasedBook.save();
 
-                const savedCustomer = await customerToBeUpdated.save()
+                
 
                 const messageContent = { to: '2347051807727', message: `Customer (${customer?.customer_code}) ${customerToBeUpdated?.first_name} ${customerToBeUpdated?.last_name} just bought a book ${book?.bookName} by ${book.bookAuthor} for NGN${parseFloat(amount / 100)}`, sender_name: 'Sendchamp', route: 'dnd' }
 
