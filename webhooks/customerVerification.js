@@ -115,7 +115,7 @@ router.post('/customer-verification', async (req, res) => {
                 }
 
             case "charge.success": {
-                res.sendStatus(200);
+                
 
                 const { data } = req.body;
 
@@ -144,7 +144,12 @@ router.post('/customer-verification', async (req, res) => {
 
                 console.log("the book ID", book?.bookId);
 
-                const purchasedBook = await Book.findOne({ bookId: book?.bookId });  
+                const purchasedBook = await Book.findOne({ bookId: book?.bookId }); 
+                
+                if(purchasedBook === null){
+                    res.sendStatus(400);
+                    break;
+                }
 
 
                 console.log("The purchased book??",purchasedBook);
@@ -152,6 +157,8 @@ router.post('/customer-verification', async (req, res) => {
                 purchasedBook.transactionId = data.id
 
                 const savePurchasedBook  = await purchasedBook.save();
+
+                res.sendStatus(200);
 
                 
 
