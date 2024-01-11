@@ -25,6 +25,7 @@ const bookSchema = mongoose.Schema({
     },
     bookId: {
         type: String,
+        default: "",
         required: true,
 
     },

@@ -122,8 +122,11 @@ router.post('/customer-verification', async (req, res) => {
                 const { customer, metadata, amount } = data
 
 
+                console.log("The book metadata from metadata paystack",metadata);
 
-                console.log(customer);
+                console.log("The data from paystack", data);
+
+                console.log("customer from paystack",customer);
 
                 const { book } = metadata
 
@@ -138,6 +141,8 @@ router.post('/customer-verification', async (req, res) => {
                 await customerToBeUpdated.transactions.push({ ...data, item: { ...metadata } });
 
                 const purchasedBook = await Book.findOne({ bookId: book?.bookId });
+
+                console.log("The purchased book??",purchasedBook);
 
                 purchasedBook.transactionId = data.id
 
