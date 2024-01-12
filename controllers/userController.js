@@ -127,7 +127,7 @@ export const verifyEmail = async (req, res) => {
 
 export const getUserData = async (req, res) => {
     try {
-        const email = req.query.email;
+        const {email} = req;
 
         if (!email) throw Error("Please enter an email address");
 
