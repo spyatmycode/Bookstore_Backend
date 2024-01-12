@@ -38,17 +38,6 @@ export const createUser = async (req, res) => {
 
 
 
-
-        //they are expecting a link that will send them the link to send the verification mail.
-        //then clicking the link from the email will verify their email and then redirect them to the login page
-
-
-
-
-        // email, password, first_name,last_name, customer_code
-
-        //generate a new user token that keeps them authenticated until it expires
-
         const token = generateAccessToken(newuser._id)
 
         return res.status(201).send({ message: "Account created. Please verify your email", email: newuser.email, token })
@@ -61,6 +50,8 @@ export const createUser = async (req, res) => {
     }
 }
 
+//This is to log a user in
+
 export const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -71,9 +62,9 @@ export const loginUser = async (req, res) => {
 
         const user = await User.login(email, password);
 
-        if(user.error){
+        if (user.error) {
             console.log("here");
-            return res.status(200).send({message: user.error})
+            return res.status(200).send({ message: user.error })
         }
 
         const token = generateAccessToken(user._id)
@@ -87,47 +78,78 @@ export const loginUser = async (req, res) => {
     }
 }
 
-export const sendEmailVerification = async(req, res)=>{
+//To send email verification
 
-    const {email} = req.query;
+export const sendEmailVerification = async (req, res) => {
+
+    const { email } = req;
 
 
-    if(!email) throw Error("Enter email please")
+    if (!email) throw Error("Enter email please")
 
     try {
         const link = await sendVerificationEmail(email);
 
-        return res.status(200).send({message: "Verification email sent!"})
+        return res.status(200).send({ message: "Verification email sent!" })
     } catch (error) {
 
-        return res.status(500).send({message: error.message || "An error occured"})
-        
+        return res.status(500).send({ message: error.message || "An error occured" })
+
     }
 
 }
 
+//To verify a user email
+
 export const verifyEmail = async (req, res) => {
     const { email, token } = req.query
 
+    try {
 
-    const payload = jwt.verify(token, SECRET)
+        const payload = jwt.verify(token, SECRET)
+
+        if (payload.email !== email) {
+            return res.status(400).send(`<div style="font-size:20px;"> Unauthorized <a href="${DOMAIN_URL}/auth"> Sign up here</a> to login</div>`);
+
+        }
+
+        const user = await User.findOne({ email: email })
+
+        if (!user) {
+
+            return res.status(200).send(`<div style="font-size:20px;">User not found <a href="${DOMAIN_URL}/auth">here</a> to login</div>`);
+
+        }
+
+        user.emailConfirmed = "true"
+
+        const saveUser = await user.save()
+
+        res.status(200).send(`<div style="font-size:20px;"> Akeju loves you <br/> Email verified successfully. Click <a href="${DOMAIN_URL}/auth">here</a> to login</div>`);
 
 
-    const user = await User.findOne({ email: email })
+    } catch (error) {
 
-    user.emailConfirmed = "true"
+        if (error.name === 'TokenExpiredError') {
+            return res.status(401).send(`<div style="font-size:20px;"> Token has expired. <a href="${DOMAIN_URL}/auth">here</a> to login</div>`);
+        }
 
-    const saveUser = await user.save()
+        console.error(error);
+        return res.status(401).send(`<div style="font-size:20px;"> Unauthorized <a href="${DOMAIN_URL}/auth">here</a> to login</div>`);
 
-    res.status(200).send(`<div style="font-size:20px;"> Akeju loves you <br/> Email verified successfully. Click <a href="${DOMAIN_URL}/auth">here</a> to login</div>`);
+    }
 
-     
+
+
+
 }
 
 
+//To get user data from db
+
 export const getUserData = async (req, res) => {
     try {
-        const {email} = req;
+        const { email } = req;
 
         if (!email) throw Error("Please enter an email address");
 

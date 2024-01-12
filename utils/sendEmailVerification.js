@@ -26,7 +26,7 @@ const transporter = nodemailer.createTransport({
 
 
 export const sendVerificationEmail =async (email)=>{
-    const token = jwt.sign({email}, SECRET, {expiresIn: "1hr"})
+    const token = jwt.sign({email}, SECRET, {expiresIn: "10m"})
 
     const link = `${API_URL}/api/users/email-verification?email=${email}&token=${token}`
 

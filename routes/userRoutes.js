@@ -14,7 +14,7 @@ router.post('/login',loginUser);
 
 router.get('/', requireAuth ,getUserData);
 
-router.post('/send-verification-email', sendEmailVerification);
+router.post('/send-verification-email', requireAuth,sendEmailVerification);
 
 router.get("/email-verification", verifyEmail);
 
