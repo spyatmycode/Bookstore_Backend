@@ -8,6 +8,7 @@ import booksRouter from './routes/booksRoutes.js';
 import userRouter from './routes/userRoutes.js';
 import payStackUserRouter from './routes/payStack.js'
 import webHookRouter from './webhooks/customerVerification.js'
+import pdfRouter from './routes/pdfRoute.js'
 import cors from 'cors'
 import { Server } from 'socket.io';
 import http from 'http'
@@ -22,7 +23,8 @@ app.use(cors());
 app.use('/books', booksRouter)
 app.use('/api/users',userRouter)
 app.use('/api/paystack', payStackUserRouter);
-app.use('/api/webhooks', webHookRouter)
+app.use('/api/webhooks', webHookRouter);
+app.use('/',pdfRouter );
 
 
 const server = http.createServer(app)

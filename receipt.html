@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: white;
+            font-family: "Open sans", sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+            align-items: center;
+            justify-content: center;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 600px; /* Adjust as needed */
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .divider {
+            display: block;
+            width: 100%;
+        }
+
+        .divider_top {
+            height: 20vh;
+        }
+
+        .divider_bottom {
+            height: 80vh;
+            background-color: #FBFBFB;
+        }
+
+        .parent {
+            position: absolute;
+            box-shadow: 0 5px 10px 0 gray;
+            display: flex;
+            justify-content: center;
+            width: auto;
+            align-items: center;
+            gap: 100px;
+            padding: 20px 30px;
+            background-color: white;
+            border-radius: 20px;
+        }
+
+        .not_qr {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            gap: 10px;
+            padding: 20px 30px;
+            background-color: white;
+            border-radius: 20px;
+        }
+
+        .first_row {
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+            gap: 20px;
+        }
+
+        .book_div, .author_div {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        img {
+            width: 300px;
+            height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="divider divider_top"></div>
+    <div class="parent">
+        <table>
+            <tbody>
+                <tr>
+                    <th>Book name</th>
+                    <td style="color:dodgerblue;">The actual event name</td>
+                </tr>
+                <tr>
+                    <th>Date</th>
+                    <td style="color:red;">2024</td>
+                </tr>
+                <tr>
+                    <th>Author name</th>
+                    <td>Akeju Oluwanifemi</td>
+                </tr>
+                <tr>
+                    <th>Price</th>
+                    <td>NGN 100</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="qr_code">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png" alt="">
+        </div>
+    </div>
+    <div class="divider divider_bottom"></div>
+</body>
+</html>

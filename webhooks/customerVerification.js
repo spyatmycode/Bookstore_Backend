@@ -7,13 +7,13 @@ const router = express.Router()
 import { io } from '../index.js';
 import { sendVerificationSms } from '../utils/sendVerificationMessage.js';
 import { User } from '../models/userModel.js';
-import { PAYSTACK_SECRET_LIVE } from '../config/config.js';
+import { PAYSTACK_SECRET_LIVE, PAYSTACK_SECRET_TEST } from '../config/config.js';
 import { Book } from '../models/bookModel.js';
 import { transporter } from '../utils/sendMail.js';
 import { mailOptions } from '../utils/sendEmailVerification.js';
 
 const allowContinuation = (req) => {
-    const hash = crypto.createHmac('sha512', PAYSTACK_SECRET_LIVE).update(JSON.stringify(req.body)).digest('hex');
+    const hash = crypto.createHmac('sha512', PAYSTACK_SECRET_TEST).update(JSON.stringify(req.body)).digest('hex');
 
     //TODO: remove the comment below
     if (hash !== req.headers['x-paystack-signature']) {
@@ -29,6 +29,10 @@ const allowContinuation = (req) => {
 router.post('/customer-verification', async (req, res) => {
 
     allowContinuation(req)
+
+    console.log("WEB HOOOOOOOOOOOKKKKKKKKKKKK WAS HIT");
+
+    console.log("============================================================");
 
 
 
@@ -164,7 +168,7 @@ router.post('/customer-verification', async (req, res) => {
 
                 
 
-                const messageContent = { to: '2347051807727', message: `Customer (${customer?.customer_code}) ${customerToBeUpdated?.first_name} ${customerToBeUpdated?.last_name} just bought a book ${book?.bookName} by ${book.bookAuthor} for NGN${parseFloat(amount / 100)}`, sender_name: 'Sendchamp', route: 'dnd' }
+                const messageContent = { to: '2347051807727', message: `Customer (${customer?.customer_code}) ${customerToBeUpdated?.first_name} ${customerToBeUpdated?.last_name} just bought a book ${book?.title} by ${book.author} for NGN${parseFloat(amount / 100)}`, sender_name: 'Sendchamp', route: 'dnd' }
 
                 io.emit('charge.success', { message: messageContent.message })
 

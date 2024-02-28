@@ -5,9 +5,9 @@ import { User } from '../models/userModel.js';
 
 export const requireAuth = async (req, res, next) => {
     try {
-        console.log(req.headers);
+        // console.log(req.headers);
 
-        console.log(req);
+        // console.log(req);
 
         const { authorization } = req.headers;
 
@@ -27,17 +27,17 @@ export const requireAuth = async (req, res, next) => {
         const { _id } = jwt.verify(token, SECRET);
 
         const userId = await User.findOne({ _id }).select('_id email');
-        const customer_code = await User.findOne({ _id });
+        const customer = await User.findOne({ _id });
         
-        if (!customer_code) throw Error("customer code not found");
+        if (!customer) throw Error("customer code not found");
         
         req.userId = userId;
-        req.customer_code = customer_code?.payStackCustomerID;
-        req.first_name = customer_code.first_name;
-        req.last_name = customer_code.last_name;
-        req.email = customer_code.email;
+        req.customer_code = customer?.payStackCustomerID;
+        req.first_name = customer.first_name;
+        req.last_name = customer.last_name;
+        req.email = customer.email;
 
-        console.log(customer_code);
+        // console.log(customer_code);
 
         next();
     } catch (error) {

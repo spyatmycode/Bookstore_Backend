@@ -28,4 +28,4 @@ const fileFilter = (req, file, cb) => {
 
 
 
-export let upload = multer({ storage,limits:{fileSize:3000000, files: 1} });
+export let upload = multer({ storage,limits:{ files: 1} });
