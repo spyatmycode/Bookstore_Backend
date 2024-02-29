@@ -30,7 +30,9 @@
     "pdfkit": "^0.14.0",
     "qrcode": "^1.5.3",
     "socket.io": "^4.7.2",
+    "svg-to-pdfkit": "^0.1.8",
     "uuid": "^9.0.1",
-    "validator": "^13.11.0"
+    "validator": "^13.11.0",
+    "wkhtmltopdf": "^0.4.0"
   }
 }
