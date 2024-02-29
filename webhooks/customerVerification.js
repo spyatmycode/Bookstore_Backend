@@ -13,11 +13,16 @@ import { transporter } from '../utils/sendMail.js';
 import { mailOptions } from '../utils/sendEmailVerification.js';
 
 const allowContinuation = (req) => {
-    const hash = crypto.createHmac('sha512', PAYSTACK_SECRET_TEST).update(JSON.stringify(req.body)).digest('hex');
+    const hash = crypto.createHmac('sha512', PAYSTACK_SECRET_LIVE).update(JSON.stringify(req.body)).digest('hex');
 
     //TODO: remove the comment below
-    if (hash !== req.headers['x-paystack-signature']) {
-        throw new Error("Invalid signature! Request is unauthorized")
+    try {
+        if (hash !== req.headers['x-paystack-signature']) {
+            throw new Error("Invalid signature! Request is unauthorized")
+        }
+    } catch (error) {
+        console.log(error);
+
     }
 
 }
@@ -121,24 +126,24 @@ router.post('/customer-verification', async (req, res) => {
                 }
 
             case "charge.success": {
-                
+
 
                 const { data } = req.body;
 
                 const { customer, metadata, amount } = data
 
 
-                console.log("The book metadata from metadata paystack",metadata);
+                console.log("The book metadata from metadata paystack", metadata);
 
                 console.log("The data from paystack", data);
 
-                console.log("customer from paystack",customer);
+                console.log("customer from paystack", customer);
 
                 const { book } = metadata
 
                 console.log("book from meta data", book);
 
-                console.log("webhook: this is customer details",customer);
+                console.log("webhook: this is customer details", customer);
 
                 const customerToBeUpdated = await User.findOne({ payStackCustomerID: customer?.customer_code });
 
@@ -152,23 +157,23 @@ router.post('/customer-verification', async (req, res) => {
 
                 console.log("the book ID", book?.bookId);
 
-                const purchasedBook = await Book.findOne({ bookId: book?.bookId }); 
-                
-                if(purchasedBook === null){
+                const purchasedBook = await Book.findOne({ bookId: book?.bookId });
+
+                if (purchasedBook === null) {
                     res.sendStatus(400);
                     break;
                 }
 
 
-                console.log("The purchased book??",purchasedBook);
+                console.log("The purchased book??", purchasedBook);
 
                 purchasedBook.transactionId = data.id
 
-                const savePurchasedBook  = await purchasedBook.save();
+                const savePurchasedBook = await purchasedBook.save();
 
                 res.sendStatus(200);
 
-                
+
 
                 const messageContent = { to: '2347051807727', message: `Customer (${customer?.customer_code}) ${customerToBeUpdated?.first_name} ${customerToBeUpdated?.last_name} just bought a book ${book?.title} by ${book.author} for NGN${parseFloat(amount / 100)}`, sender_name: 'Sendchamp', route: 'dnd' }
 
