@@ -13,7 +13,7 @@ import { transporter } from '../utils/sendMail.js';
 import { mailOptions } from '../utils/sendEmailVerification.js';
 
 const allowContinuation = (req) => {
-    const hash = crypto.createHmac('sha512', PAYSTACK_SECRET_LIVE).update(JSON.stringify(req.body)).digest('hex');
+    const hash = crypto.createHmac('sha512', PAYSTACK_SECRET_TEST).update(JSON.stringify(req.body)).digest('hex');
 
     //TODO: remove the comment below
     try {
