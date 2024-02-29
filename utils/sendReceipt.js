@@ -58,7 +58,7 @@ export const sendReceipt = async(email, content)=>{
             text: 'Please find attached the book ticket PDF.',
             attachments: [
                 {
-                    filename: `${content.name}_${content.name}_${content.publishYear}.pdf`,
+                    filename: `${content.name}_${content.author}_${content.publishYear}.pdf`,
                     content: stream,
                 },
             ],
