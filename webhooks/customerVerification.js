@@ -138,6 +138,8 @@ router.post('/customer-verification', async (req, res) => {
 
                 console.log("book from meta data", book);
 
+                console.log("webhook: this is customer details",customer);
+
                 const customerToBeUpdated = await User.findOne({ payStackCustomerID: customer?.customer_code });
 
                 console.log(customerToBeUpdated);

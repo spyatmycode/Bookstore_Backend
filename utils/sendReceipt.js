@@ -10,8 +10,9 @@ import pdf from "html-pdf";
 
 export const sendReceipt = async(email, content)=>{
 
-
+    console.log("We're in the sendReciept");
     console.log("Contenet at sendReciept", content);
+    
 
 
 

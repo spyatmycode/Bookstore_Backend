@@ -98,7 +98,7 @@ export const addBook = async (req, res) => {
 
         const { id, amount, metadata } = confirmPaymentResponse?.data;
 
-        console.log("This is the meta data", metadata);
+        console.log("This is the meta data from paystack in the book controller", metadata);
 
         const { title, author, publishYear, bookId } = metadata.book
 

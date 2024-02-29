@@ -186,9 +186,11 @@ router.post('/pdf/send', async (req, res) => {
         });
 
 
-        return res.status(200).send({
+        res.status(200).send({
             message: "Email Ticket sent successfully"
         })
+
+        console.log("pdfroute?");
     } catch (error) {
 
         console.log(error);
